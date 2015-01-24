@@ -51,6 +51,15 @@ class labyrinthe(list):
 		return path
 
 
+	def get_neighbors(self, pos):
+		moves = [1, self.size[0],-1,-self.size[0]]
+		neighbors = []
+		for i in range(len(moves)):
+			if self[pos][i] == 0:
+				neighbors.append(pos+moves[i])
+		return neighbors
+
+
 	def get_image_and_rects(self,cellulesize,wallcolor=(0,0,0),celcolor=(255,255,255)):
 		x,y = cellulesize
 		image = Surface((x*(self.size[0]),y*self.size[1]))
