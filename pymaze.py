@@ -2,6 +2,54 @@ from pygame import*
 quit
 import random
 
+
+from Queue import PriorityQueue
+
+
+
+
+# (x,y)
+
+class AStar:
+	def __init__(self, start, goal):
+		self.start = start
+		self.goal = goal
+
+		self.frontier = PriorityQueue()
+		self.frontierSet = set() # same contents as frontier, but stored as a set for O(1) lookup
+
+		self.closed_set = set()
+
+		self.cost_so_far = {start: 0}
+		self.came_from = {start: None}
+
+
+		def grow(self, maze):
+			# remove and return the lowest-cost item from the frontier
+			current = self.frontier.get()
+
+			if current == self.goal:
+				return current
+
+			self.closed_set.add(current)
+
+			for neighbor in maze.get_neighbors(current):
+				tentative_cost_so_far = cost_so_far[current] + 1
+				# TODO
+
+			# TODO: Alex
+
+
+def BiStar(maze, start, goal):
+	# TODO: Justin
+
+
+
+
+
+
+
+
 class labyrinthe(list):
 	''
 	def __init__(self,size):
