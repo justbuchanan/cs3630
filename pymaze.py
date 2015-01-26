@@ -36,11 +36,12 @@ class AStar:
 			for neighbor in maze.get_neighbors(current):
 				tentative_cost_so_far = cost_so_far[current] + 1
 				# TODO
-
-			# TODO: Alex
+                pass
+                # TODO: Alex
 
 
 def BiStar(maze, start, goal):
+    pass
 	# TODO: Justin
 
 
@@ -51,7 +52,6 @@ def BiStar(maze, start, goal):
 
 
 class labyrinthe(list):
-	''
 	def __init__(self,size):
 		self.size = size
 		labx,laby = size
