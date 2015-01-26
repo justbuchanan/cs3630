@@ -42,15 +42,54 @@ class AStar:
     def min_cost_to_goal(self, node):
         return abs(node[0]-self.goal[0])+abs(node[1]-self.goal[1])
 
-def BiStar(maze, start, goal):
-    pass
+
+    def get_path(self, state):
+        path = [state]
+        while path[0] != self.start:
+            path.insert(0, self.came_from[path[0]])
+        return path
 
 
-# TODO: Justin
+
+def RunBiStar(maze, start, goal):
+    startTree = AStar(maze, start, goal)
+    goalTree = AStar(maze, goal, start)
+
+    # returns the best
+    def bestPossibleCost():
+        bestStart = startTree.frontier.get()
+        startTree.frontier.put(bestStart)
+        bestGoal = goalTree.frontier.get()
+        goalTree.frontier.put(bestGoal)
+
+        return bestStart[0] + bestGoal[0]
 
 
+    def makePath(midpoint):
+        return startTree.get_path(midpoint) + reversed(goalTree.get_path(midpoint))[1:]
 
 
+    currentGoalCost = float('inf')
+    currentGoal = None
+
+    treePairs = [(startTree, goalTree), (goalTree, startTree)]
+    iterationCount = 0
+
+    while currentGoalCost < bestPossibleCost() and len(fromTree.frontier) + len(toTree.frontier) > 0:
+        trees = treePairs[iterationCount % 2]
+
+        fromTree = trees[0]
+        toTree = trees[1]
+
+        newState = fromTree.grow()
+        if newState in toTree.frontier:
+            newGoalCost = fromTree.cost_to[newState] + toTree.cost_to[newState]
+            if newGoalCost < currentGoalCost:
+                currentGoal = newState
+                currentGoalCost = newGoalCost
+
+        ++iterationCount
+    return makePath(currentGoal), startTree.closed_set + goalTree.closed_set
 
 
 
@@ -87,6 +126,10 @@ class labyrinthe(list):
 
 
     def get_path(self, start, exit):
+        return RunBiStar(self, start, exit)
+
+
+    def left_hand_rule(self, start, exit):
         pos = start
         d = 1
         path = [pos]
