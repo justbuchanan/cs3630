@@ -83,14 +83,11 @@ class labyrinthe(list):
 
 		
 	def get_path(self,start,exit):
-		explored = []
-
 		pos = start
 		d = 1
 		path = [pos]
 		ref = [1,self.size[0],-1,-self.size[0]]
 		while pos != exit:
-			explored.append(pos)
 			if self[pos][ref.index(d)-1] == 0: d = ref[ref.index(d)-1]
 			if self[pos][ref.index(d)] == 0:
 				pos = pos+d
@@ -99,7 +96,7 @@ class labyrinthe(list):
 				if i != len(path)-1:
 					del(path[i:-1])			
 			else: d = ref[ref.index(d)-3]
-		return path, explored
+		return path
 
 
 	def get_neighbors(self, pos):
@@ -132,14 +129,6 @@ if __name__ == '__main__':
 	screen.blit(image,(0,0))
 	start = random.randrange(len(L))
 	exit = random.randrange(len(L))
-
-	# draw solution found from get_path()
-	path, explored = L.get_path(start, exit)
-	for pt in explored:
-		screen.fill(0xff00ff, rectslist[pt])
-	for pt in path:
-		screen.fill(0x00ffff, rectslist[pt])
-
 	screen.fill(0x00ff00,rectslist[exit])
 	screen.blit(me,rectslist[start])
 	display.flip()
