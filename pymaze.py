@@ -1,9 +1,9 @@
 from pygame import *
-
+import math
 import random
-
 from Queue import PriorityQueue
 import Queue
+import time
 
 
 
@@ -48,15 +48,9 @@ class AStar:
         return node in self.frontierSet
 
 
-    def coords_for_state(self, state):
-        x = state % self.maze.size[0]
-        y = state / self.maze.size[0]
-        return x, y
-
-
     def min_cost_to_goal(self, state):
-        s = self.coords_for_state(state)
-        g = self.coords_for_state(self.goal)
+        s = self.maze.coords_for_state(state)
+        g = self.maze.coords_for_state(self.goal)
 
         return abs(s[0]-g[0]) + abs(s[1]-g[1])
 
@@ -154,6 +148,12 @@ class labyrinthe(list):
         del (self[lx - 2::lx - 1])
 
 
+    def coords_for_state(self, state):
+        x = state % self.size[0]
+        y = state / self.size[0]
+        return x, y
+
+
     def get_path(self, start, exit):
         return RunBiStar(self, start, exit)
 
@@ -238,3 +238,31 @@ if __name__ == '__main__':
                 screen.fill(0x0000ff, rectslist[i])
                 display.update(rectslist[i])
                 time.wait(20)
+
+
+def test(func, size=(50,50)):
+    L = labyrinthe(size)
+    start = random.randrange(len(L))
+    exit = random.randrange(len(L))
+    startTime = time.time()
+    path, explored = func(L, start, exit)
+    elapsedTime = time.time() - startTime
+
+    sxy = L.coords_for_state(start)
+    gxy = L.coords_for_state(exit)
+    euclideanDist = math.sqrt((sxy[0]-gxy[0])**2 + (sxy[1]-gxy[1])**2)
+
+    CR = (len(path) - 1) / euclideanDist
+
+    return elapsedTime, CR, len(explored)
+
+
+def testBiStar100():
+    print "Running 100 trials of BiStar"
+    trials = [test(RunBiStar) for i in range(100)]
+    times = [t[0] for t in trials]
+    CRs = [t[1] for t in trials]
+    explored = [t[2] for t in trials]
+    print "Average Time: " + str(sum(times)/len(times))
+    print "Average CR: " + str(sum(CRs)/len(CRs))
+    print "Average # of nodes explored: " + str(sum(explored)/len(explored))
