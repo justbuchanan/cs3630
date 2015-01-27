@@ -3,6 +3,8 @@ from pygame import *
 import random
 
 from Queue import PriorityQueue
+import Queue
+
 
 
 class AStar:
@@ -18,29 +20,45 @@ class AStar:
         self.frontier = PriorityQueue()
         self.frontierSet = set()  # same contents as frontier, but stored as a set for O(1) lookup
 
-        self.frontier.put((0, start))
+        self.frontier.put((self.min_cost_to_goal(start), start))
         self.frontierSet.add(start)
+
 
     def grow(self):
         # remove and return the lowest-cost item from the frontier
-        current = self.frontier.get()
+        current = self.frontier.get_nowait()
         if current == self.goal:
-            return current
+            return current[1]
 
-        self.closed_set.add(current)
-        self.frontierSet.remove(current)
+        self.closed_set.add(current[1])
+        if current[1] in self.frontierSet:
+            self.frontierSet.remove(current[1])
 
-        for neighbor in self.maze.get_neighbors(current):
-            self.cost_to[neighbor] = self.cost_to[current] + 1
-            self.came_from[neighbor] = current
-            self.frontier.put((self.cost_to[neighbor] + self.min_cost_to_goal(neighbor), neighbor))
-            self.frontierSet.add(neighbor)
+
+        for neighbor in self.maze.get_neighbors(current[1]):
+            if neighbor not in self.closed_set:
+                self.cost_to[neighbor] = self.cost_to[current[1]] + 1
+                self.came_from[neighbor] = current[1]
+                self.frontier.put((self.cost_to[neighbor] + self.min_cost_to_goal(neighbor), neighbor))
+                self.frontierSet.add(neighbor)
+        return current[1]
+
 
     def is_in_frontier(self, node):
         return node in self.frontierSet
 
-    def min_cost_to_goal(self, node):
-        return abs(node[0]-self.goal[0])+abs(node[1]-self.goal[1])
+
+    def coords_for_state(self, state):
+        x = state % self.maze.size[0]
+        y = state / self.maze.size[0]
+        return x, y
+
+
+    def min_cost_to_goal(self, state):
+        s = self.coords_for_state(state)
+        g = self.coords_for_state(self.goal)
+
+        return abs(s[0]-g[0]) + abs(s[1]-g[1])
 
 
     def get_path(self, state):
@@ -57,16 +75,19 @@ def RunBiStar(maze, start, goal):
 
     # returns the best
     def bestPossibleCost():
-        bestStart = startTree.frontier.get()
-        startTree.frontier.put(bestStart)
-        bestGoal = goalTree.frontier.get()
-        goalTree.frontier.put(bestGoal)
+        try:
+            bestStart = startTree.frontier.get_nowait()
+            startTree.frontier.put(bestStart)
+            bestGoal = goalTree.frontier.get_nowait()
+            goalTree.frontier.put(bestGoal)
+        except Queue.Empty:
+            return float('inf')
 
         return bestStart[0] + bestGoal[0]
 
 
     def makePath(midpoint):
-        return startTree.get_path(midpoint) + reversed(goalTree.get_path(midpoint))[1:]
+        return startTree.get_path(midpoint) + list(reversed(goalTree.get_path(midpoint)))[1:]
 
 
     currentGoalCost = float('inf')
@@ -75,21 +96,29 @@ def RunBiStar(maze, start, goal):
     treePairs = [(startTree, goalTree), (goalTree, startTree)]
     iterationCount = 0
 
-    while currentGoalCost < bestPossibleCost() and len(fromTree.frontier) + len(toTree.frontier) > 0:
+    while currentGoalCost > bestPossibleCost() and (not startTree.frontier.empty() and not goalTree.frontier.empty()):
         trees = treePairs[iterationCount % 2]
 
         fromTree = trees[0]
         toTree = trees[1]
 
         newState = fromTree.grow()
-        if newState in toTree.frontier:
+        if newState in toTree.closed_set:
             newGoalCost = fromTree.cost_to[newState] + toTree.cost_to[newState]
             if newGoalCost < currentGoalCost:
                 currentGoal = newState
                 currentGoalCost = newGoalCost
 
-        ++iterationCount
-    return makePath(currentGoal), startTree.closed_set + goalTree.closed_set
+
+        iterationCount += 1
+
+
+    explored = startTree.closed_set.union(goalTree.closed_set)
+
+    if currentGoal == None:
+        raise RuntimeError("No solution found")
+
+    return makePath(currentGoal), explored
 
 
 
@@ -180,6 +209,14 @@ if __name__ == '__main__':
     screen.blit(image, (0, 0))
     start = random.randrange(len(L))
     exit = random.randrange(len(L))
+
+    # draw solution found from get_path()
+    path, explored = L.get_path(start, exit)
+    for pt in explored:
+        screen.fill(0xff00ff, rectslist[pt])
+    for pt in path:
+        screen.fill(0x00ffff, rectslist[pt])
+
     screen.fill(0x00ff00, rectslist[exit])
     screen.blit(me, rectslist[start])
     display.flip()
