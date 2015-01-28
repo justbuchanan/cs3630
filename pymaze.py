@@ -271,19 +271,11 @@ def testNTimes(func, n):
     explored = list()
     print "Running " + str(n) + " trials of " + str(func)
     trials = [test(func) for i in range(n)]
-    print len(trials)
-    print filter(lambda x: x == None, trials)
-    print trials
     i = 0
     for trial in trials:
-        if not trial == None:
-            times.append(trial[0])
-            CRs.append(trial[1])
-            explored.append(trial[2])
-    print "len trials: " + str(len(trials))
-    print "len times: " + str(len(times))
-    print "len CRs: " + str(len(CRs))
-    print "len explored: " + str(len(explored))
+        times.append(trial[0])
+        CRs.append(trial[1])
+        explored.append(trial[2])
     print "Average Time: " + str(sum(times)/len(times))
     print "Average CR: " + str(sum(CRs)/len(CRs))
     print "Average # of nodes explored: " + str(sum(explored)/len(explored))
