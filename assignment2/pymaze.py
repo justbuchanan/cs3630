@@ -18,10 +18,8 @@ class AStar:
 
         self.closed_set = set()
         self.frontier = PriorityQueue()
-        self.frontierSet = set()  # same contents as frontier, but stored as a set for O(1) lookup
 
         self.frontier.put((self.min_cost_to_goal(start), start))
-        self.frontierSet.add(start)
 
 
     def grow(self):
@@ -31,21 +29,14 @@ class AStar:
             return current[1]
 
         self.closed_set.add(current[1])
-        if current[1] in self.frontierSet:
-            self.frontierSet.remove(current[1])
-
 
         for neighbor in self.maze.get_neighbors(current[1]):
             if neighbor not in self.closed_set:
                 self.cost_to[neighbor] = self.cost_to[current[1]] + 1
                 self.came_from[neighbor] = current[1]
                 self.frontier.put((self.cost_to[neighbor] + self.min_cost_to_goal(neighbor), neighbor))
-                self.frontierSet.add(neighbor)
+
         return current[1]
-
-
-    def is_in_frontier(self, node):
-        return node in self.frontierSet
 
 
     def min_cost_to_goal(self, state):
@@ -62,6 +53,16 @@ class AStar:
         return path
 
 
+def RunAStar(maze, start, goal):
+    searchTree = AStar(maze, start, goal)
+    thisnode = None
+
+    while not searchTree.frontier.empty() and not thisnode == searchTree.goal:
+        thisnode = searchTree.grow()
+    if not thisnode == searchTree.goal:
+        return None #unsolvable maze
+    return (searchTree.get_path(searchTree.goal), searchTree.closed_set)
+
 
 def RunBiStar(maze, start, goal):
     startTree = AStar(maze, start, goal)
@@ -77,7 +78,9 @@ def RunBiStar(maze, start, goal):
         except Queue.Empty:
             return float('inf')
 
-        return bestStart[0] + bestGoal[0]
+        # edited to reflect the priority of the nodes being estimated total cost
+        # ie, action cost to node + estimated cost to goal
+        return min(bestStart[0], bestGoal[0])
 
 
     def makePath(midpoint):
@@ -102,15 +105,12 @@ def RunBiStar(maze, start, goal):
             if newGoalCost < currentGoalCost:
                 currentGoal = newState
                 currentGoalCost = newGoalCost
-
-
         iterationCount += 1
 
-
     explored = startTree.closed_set.union(goalTree.closed_set)
-
     if currentGoal == None:
-        raise RuntimeError("No solution found")
+        #Unsolvable Maze Encountered
+        return None
 
     return makePath(currentGoal), explored
 
@@ -155,7 +155,7 @@ class labyrinthe(list):
 
 
     def get_path(self, start, exit):
-        return RunBiStar(self, start, exit)
+        return (RunBiStar(self, start, exit), RunAStar(self, start, exit))
 
 
     def left_hand_rule(self, start, exit):
@@ -200,44 +200,46 @@ class labyrinthe(list):
 # ****************************************************************************************
 #****************************************************************************************
 if __name__ == '__main__':
-    me = Surface((5, 5))
-    me.fill(0xff0000)
     L = labyrinthe((50, 50))
-    labx, laby = 50, 50
-    screen = display.set_mode((L.size[0] * 10, L.size[1] * 10))
-    image, rectslist = L.get_image_and_rects((10, 10), wallcolor=0, celcolor=0xffffff)
-    screen.blit(image, (0, 0))
     start = random.randrange(len(L))
     exit = random.randrange(len(L))
 
     # draw solution found from get_path()
-    path, explored = L.get_path(start, exit)
-    for pt in explored:
-        screen.fill(0xff00ff, rectslist[pt])
-    for pt in path:
-        screen.fill(0x00ffff, rectslist[pt])
+    results =  L.get_path(start, exit)
+    for result in results:
+        me = Surface((5, 5))
+        me.fill(0xff0000)
+        labx, laby = 50, 50
+        screen = display.set_mode((L.size[0] * 10, L.size[1] * 10))
+        image, rectslist = L.get_image_and_rects((10, 10), wallcolor=0, celcolor=0xffffff)
+        screen.blit(image, (0, 0))
+        path, explored = result
+        for pt in explored:
+            screen.fill(0xff00ff, rectslist[pt])
+        for pt in path:
+            screen.fill(0x00ffff, rectslist[pt])
 
-    screen.fill(0x00ff00, rectslist[exit])
-    screen.blit(me, rectslist[start])
-    display.flip()
-    while event.wait().type != QUIT:
-        screen.fill(-1, rectslist[start])
-        if key.get_pressed()[K_RIGHT] and not L[start][0]:
-            start += 1
-        if key.get_pressed()[K_LEFT] and not L[start][2]:
-            start += -1
-        if key.get_pressed()[K_UP] and not L[start][3]:
-            start += -L.size[1]
-        if key.get_pressed()[K_DOWN] and not L[start][1]:
-            start += L.size[0]
-        screen.fill(0xff0000, rectslist[start])
+        screen.fill(0x00ff00, rectslist[exit])
+        screen.blit(me, rectslist[start])
         display.flip()
-        if start == exit: print 'YOU WIN'; break
-        if key.get_pressed()[K_ESCAPE]:
-            for i in L.get_path(start, exit)[1:-1]:
-                screen.fill(0x0000ff, rectslist[i])
-                display.update(rectslist[i])
-                time.wait(20)
+        while event.wait().type != QUIT:
+            screen.fill(-1, rectslist[start])
+            if key.get_pressed()[K_RIGHT] and not L[start][0]:
+                start += 1
+            if key.get_pressed()[K_LEFT] and not L[start][2]:
+                start += -1
+            if key.get_pressed()[K_UP] and not L[start][3]:
+                start += -L.size[1]
+            if key.get_pressed()[K_DOWN] and not L[start][1]:
+                start += L.size[0]
+            screen.fill(0xff0000, rectslist[start])
+            display.flip()
+            if start == exit: print 'YOU WIN'; break
+            if key.get_pressed()[K_ESCAPE]:
+                for i in L.get_path(start, exit)[1:-1]:
+                    screen.fill(0x0000ff, rectslist[i])
+                    display.update(rectslist[i])
+                    time.wait(20)
 
 
 def test(func, size=(50,50)):
@@ -245,6 +247,9 @@ def test(func, size=(50,50)):
     start = random.randrange(len(L))
     exit = random.randrange(len(L))
     startTime = time.time()
+    ans = func(L, start, exit)
+    if ans == None:
+        return test(func)
     path, explored = func(L, start, exit)
     elapsedTime = time.time() - startTime
 
@@ -252,17 +257,31 @@ def test(func, size=(50,50)):
     gxy = L.coords_for_state(exit)
     euclideanDist = math.sqrt((sxy[0]-gxy[0])**2 + (sxy[1]-gxy[1])**2)
 
-    CR = (len(path) - 1) / euclideanDist
+    if euclideanDist == 0:
+        CR = len(path) - 1
+    else:
+        CR = (len(path) - 1) / euclideanDist
 
     return elapsedTime, CR, len(explored)
 
 
-def testBiStar100():
-    print "Running 100 trials of BiStar"
-    trials = [test(RunBiStar) for i in range(100)]
-    times = [t[0] for t in trials]
-    CRs = [t[1] for t in trials]
-    explored = [t[2] for t in trials]
+def testNTimes(func, n):
+    times = list()
+    CRs = list()
+    explored = list()
+    print "Running " + str(n) + " trials of " + str(func)
+    trials = [test(func) for i in range(n)]
+    i = 0
+    for trial in trials:
+        times.append(trial[0])
+        CRs.append(trial[1])
+        explored.append(trial[2])
     print "Average Time: " + str(sum(times)/len(times))
     print "Average CR: " + str(sum(CRs)/len(CRs))
     print "Average # of nodes explored: " + str(sum(explored)/len(explored))
+
+def testAStar100():
+    testNTimes(RunAStar, 100)
+
+def testBiStar100():
+    testNTimes(RunBiStar, 100)
