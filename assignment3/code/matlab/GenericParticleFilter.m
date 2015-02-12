@@ -208,6 +208,9 @@ classdef GenericParticleFilter < handle
             else
                 % create all particles at the origin
                 pf.x = zeros(pf.nparticles,3);
+                pf.x(:,1) = pf.robot.x0(1);
+                pf.x(:,2) = pf.robot.x0(2);
+                pf.x(:,3) = pf.robot.x0(3);
             end
             pf.weight = ones(pf.nparticles, 1);
             

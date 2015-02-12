@@ -143,7 +143,7 @@ classdef Differential < handle
             opt.L = 1;
             opt.rdim = 0.2;
             opt.dt = 0.1;
-            opt.x0 = zeros(3,1);
+            opt.x0 = [6,1,pi];
             opt = tb_optparse(opt, varargin);
 
             veh.V = V;
@@ -225,20 +225,23 @@ classdef Differential < handle
             % get motor values (Left-Right wrpt Fluke)
             uL=u(1);
             uR=u(2);
+
+            WheelDist = 0.1439; % dist from wheel to center of robot
             
             % Measure constants
-            r = 0; %% <------ IMPLEMENT
-            L = 0; %% <------ IMPLEMENT
+            u2v = 0.00425;
+            R = uR*u2v;    % m/s
+            L = uL*u2v;    % m/s
             
             % calculate speed
-            vx = 0; %% <------ IMPLEMENT
-            omega = 0; %% <------ IMPLEMENT
+            vx = (R+L)/2.0;
+            omega = -(R-L)/WheelDist;
             
             % update new state using Euler integration, not expmap 
             xp = veh.x; % previous state
-            veh.x(1) = 0; %% <------ IMPLEMENT
-            veh.x(2) = 0; %% <------ IMPLEMENT
-            veh.x(3) = 0; %% <------ IMPLEMENT
+            veh.x(1) = veh.x(1) + veh.dt*vx*cos(xp(3));
+            veh.x(2) = veh.x(2) + veh.dt*vx*sin(xp(3));
+            veh.x(3) = veh.x(3) + veh.dt*omega;
             
             odo = [vx*veh.dt omega*veh.dt];
             veh.odometry = odo;
