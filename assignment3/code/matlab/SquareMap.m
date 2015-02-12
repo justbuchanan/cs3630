@@ -122,7 +122,7 @@ classdef SquareMap < handle
           %polygon
           %X is 1x3 vector describing robot pose
           [polygon,intersection,t] = raytrace(map.norms,map.d,map.polys,....
-            [X(1:2);0],[cos(X(3));sin(X(3));0]);
+            [X(1:2)';0],[cos(X(3));sin(X(3));0]);
         end
 
         function f = feature(map, k)

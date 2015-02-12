@@ -380,8 +380,7 @@ classdef GenericParticleFilter < handle
 
         % step 3
         % predict observation and score the particles
-        function observe(pf, z, jf)
-        
+        function observe(pf, z, jf)        
             pf.weight = pf.sensor.weight(pf.x, z, jf, pf.L);
 
         end

@@ -280,9 +280,17 @@ classdef RangeSensor < Sensor
           
           weights = zeros(length(x),1);
           
-          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-          %              TODO: Implement this function!
-          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+          for p = 1:length(x)
+            ppos = x(p,:);
+            z_pred = s.h(ppos);
+            z_diff = z - z_pred;
+            weights(p,1) = exp(-0.5*z_diff^2*inv(L));
+            if weights(p,1) == 0
+                weights(p,1) = 0.00000001;
+            end
+          end
+          
+          weights
           
         end
 
