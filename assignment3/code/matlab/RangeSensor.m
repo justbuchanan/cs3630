@@ -278,19 +278,18 @@ classdef RangeSensor < Sensor
           %    % The weight is never zero.
           % end
           
-          weights = zeros(length(x),1);
+          weights = zeros(length(x));
           
           for p = 1:length(x)
             ppos = x(p,:);
             z_pred = s.h(ppos);
             z_diff = z - z_pred;
-            weights(p,1) = exp(-0.5*z_diff^2*inv(L));
-            if weights(p,1) == 0
-                weights(p,1) = 0.00000001;
+            weights(p) = exp(-0.5*abs(z_diff)/L);
+            if weights(p) < .001
+                weights(p) = .001;
             end
           end
           
-          weights
           
         end
 
