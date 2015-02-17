@@ -1,0 +1,1 @@
+mex -v CFLAGS='$CFLAGS -std=gnu99 -D_GNU_SOURCE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -I' getAprilTag_mex.cpp  apriltag.c apriltag_quad_thresh.c tag16h5.c tag25h7.c tag25h9.c tag36h10.c tag36h11.c tag36artoolkit.c g2d.c zarray.c zhash.c zmaxheap.c unionfind.c matd.c image_u8.c pnm.c image_f32.c image_u32.c workerpool.c time_util.c svd22.c homography.c
