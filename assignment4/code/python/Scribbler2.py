@@ -3,6 +3,7 @@ import time
 import string
 import subprocess
 import myro
+import sys
 class Scribbler2:
 
   def __init__(self, port, filename, baud=38400):
@@ -28,13 +29,30 @@ class Scribbler2:
     #self.manual_flush()
     myro.init(port);
 
-  def runCommands(self, commands):
-    for c in commands:
-      start = time.time()
-      self.setMotors(c[0],c[1])
-      while (time.time() - start < c[2]):
-        self.logNow(0);
-        time.sleep(0.1) # Read sensors at 1Hz
+  def runCommands(self):
+    speed = 150
+    cmdMap = {
+      'h': (-speed,speed),
+      'j': (-speed,-speed),
+      'k': (speed,speed),
+      'l': (speed,-speed),
+      'w': (0,0 )
+    }
+    while True:
+      cmd = sys.stdin.read(1)
+      if cmd in cmdMap:
+        speeds = cmdMap[cmd]
+        self.setMotors(speeds[0], speeds[1])
+      elif cmd == 'q':
+        break
+      elif cmd == 'p':
+        pic_fname = "pic-%d.jpg" % time.time()
+        picture = self.takePicture('jpeg');
+        self.savePicture(picture, pic_fname)
+      else:
+        pass
+      self.logNow(0);
+      time.sleep(0.1) # Read sensors at 1Hz
 
 
   image_codes = {"jpeg": "color",
