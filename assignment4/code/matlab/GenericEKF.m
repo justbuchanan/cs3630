@@ -705,7 +705,7 @@ classdef GenericEKF < handle
                 xv_pred = ekf.robot.f(xv_est', odo)';
 
                 Fx = ekf.robot.Fx(xv_est, odo); % Jacobian of f() w.r.t x
-                odomCov = ekf.V_est; % Odometry covariance
+                odomCov = odomCov = Fv*ekf.V_est*Fv'; % Odometry covariance
                 
                 %-------------------------------------------------
                 % Predicted Covariance of vehicle and map
