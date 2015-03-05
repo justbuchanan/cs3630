@@ -243,7 +243,7 @@ classdef GenericVehicle < handle
             veh.odometry = odo;
             
             veh.x_hist = [veh.x_hist; veh.x'];   % maintain history
-            
+            pause(.3);
             
 
         end

@@ -40,16 +40,19 @@ classdef DeterministicPath < handle
                 uL=v(1);
                 uR=v(2);
                 
-                scale = 0.00425;  %Change it to accordingly to what you used in Assignment 3 - Done
+                roL = .10;
+                
+                r = .01;
+                L = r / roL;
+                
+                scale = .01/r;  %Change it to accordingly to what you used in Assignment 3 - Done
                 ScaledUL = double(uL)*scale;
                 ScaledUR = double(uR)*scale;
                 
-                r = .01;
-                L = .14;
                 
                 % calculate speed
-                u(1) =  r.*((ScaledUL+ScaledUR)./2);
-                u(2) = (r./L).*(ScaledUR-ScaledUL);
+                u(1) =  r*((ScaledUL+ScaledUR)/2);
+                u(2) = (2*roL)*(ScaledUL-ScaledUR);
                 measurement = driver.log{3}(driver.counter);
                 
                 if measurement{1} == '0'

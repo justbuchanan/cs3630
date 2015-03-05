@@ -33,7 +33,7 @@ A = A * 0.0254;
 
 
 %% and a robot with noisy odometry
-initPos = [36 * 0.0254, 60 * 0.0254, -pi/4];
+initPos = [50 * 0.0254, 80 * 0.0254, 0];
 V=diag([0.1, 1.1*pi/180].^2);
 veh=GenericVehicle(V,'dt',0.3, 'x0', initPos);
 veh.add_driver(DeterministicPath('data/log-1424819946-open.txt'));
