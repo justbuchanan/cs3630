@@ -25,16 +25,18 @@ switch ext
     case '.txt'
         stats = dlmread(filename, ' ');
         
+        scaleFactor = 2.12; % because we printed small april tags
+        
         % order = top-left top-right bottom-right bottom-left
         centroid =  [(stats(:,2) + stats(:,4) + stats(:,6) + stats(:,8))./4 (stats(:,3) + stats(:,5) + stats(:,7) + stats(:,9))./4];
         bottom_left = [stats(:,8) stats(:,9)];
-        dist = centroid-bottom_left;
+        dist = centroid-bottom_left * scaleFactor;
         image_distance = sqrt(sum(dist.^2,2));
         range = focal_length*actual_distance./image_distance;
         
         centroidX = centroid(:,1);
         left = stats(:,8);
-        bearing = atan((centroidX - left)/focal_length);
+        bearing = atan((centroidX - left)*scaleFactor/focal_length);
         z = [range bearing ];   % range & bearing measurement       
         js = stats(:,1);      
         
