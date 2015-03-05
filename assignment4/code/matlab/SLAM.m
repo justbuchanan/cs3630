@@ -31,12 +31,11 @@ A = [58,122; % 1
 % convert inches to meters
 A = A * 0.0254;
 
-% A = [
-%     40, 98;
-%% and a robot with noisy odometry
 
+%% and a robot with noisy odometry
+initPos = [36 * 0.0254, 60 * 0.0254, -pi/4];
 V=diag([0.1, 1.1*pi/180].^2);
-veh=GenericVehicle(V,'dt',0.1);
+veh=GenericVehicle(V,'dt',0.3, 'x0', initPos);
 veh.add_driver(DeterministicPath('data/log-1424819946-open.txt'));
 
 % Creating the map. It places landmarks according to 'A' matrix.
