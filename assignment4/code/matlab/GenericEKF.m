@@ -699,12 +699,13 @@ classdef GenericEKF < handle
                 Pmm_est = ekf.P_est(4:end,4:end); % Estimated map covariance
                 Pvm_est = ekf.P_est(1:3,4:end); % Vehicle-map covariance
 
-                  
+                
                 % evaluate the state update function and the Jacobians
                 % if vehicle has uncertainty, predict its covariance
                 xv_pred = ekf.robot.f(xv_est', odo)';
 
                 Fx = ekf.robot.Fx(xv_est, odo); % Jacobian of f() w.r.t x
+                Fv = ekf.robot.Fv(xv_est, odo);
                 odomCov = Fv*ekf.V_est*Fv'; % Odometry covariance
                 
                 %-------------------------------------------------
