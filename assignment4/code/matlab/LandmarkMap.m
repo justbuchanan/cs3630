@@ -57,6 +57,15 @@ classdef LandmarkMap < handle
         nfeatures   % number of features in map
 
         verbose
+        %%walls = SquareMap([ %walls in the map
+        %                0, 0, 120, 1,   %bottom wall
+        %                0, 29, 1, 60,   %left wall
+        %                30, 89, 19, 10, %top left box
+        %                51, 123, 13, 6, %topmost box
+        %                120, 0, 1, 102, %right wall
+        %                84, 102, 36, 50,%plastic covering
+        %                77, 95, 7, 18,  %top right box
+        %                ])
     end
 
     methods
@@ -119,6 +128,7 @@ classdef LandmarkMap < handle
             plot(map.map(1,:)', map.map(2,:)', args{:});
             grid on
             hold on
+            %plot(environment);
         end
 
         function show(map, varargin)

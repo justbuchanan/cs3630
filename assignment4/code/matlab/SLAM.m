@@ -3,7 +3,7 @@
 path(path, 'aprilTag');
 
 % Specify the locations of the April tags in the Map
-A =  [5,6; 7,8; 1,0];
+A =  [36, 0; 84, 0; 120, 18; 0, 32; 0, 84; 120, 78; 100, 102; 70, 98; 19, 116; 40, 88; 40, 98; 58, 122; 70, 98];
 %% and a robot with noisy odometry
 
 V=diag([0.1, 1.1*pi/180].^2);
