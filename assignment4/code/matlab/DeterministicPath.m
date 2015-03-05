@@ -35,12 +35,12 @@ classdef DeterministicPath < handle
                     driver.log{1}(driver.counter)
                     driver.log{2}(driver.counter)
                     ];
-                                
+                
                 % get motor values (Left-Right wrpt Fluke)
                 uL=v(1);
                 uR=v(2);
                 
-                scale = 0.00425;  %Change it to accordingly to what you used in Assignment 3 - Done
+                scale = 0.1025;  %Change it to accordingly to what you used in Assignment 3 - Done
                 ScaledUL = double(uL)*scale;
                 ScaledUR = double(uR)*scale;
                 

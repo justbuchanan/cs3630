@@ -714,7 +714,7 @@ classdef GenericEKF < handle
                 %------------------------------------------------
                 
                 % Predicted covariance of vehicle
-                Pvv_pred = Fx*Pvv_est + odomCov; % Justin
+                Pvv_pred = Fx*Pvv_est*(Fx') + odomCov; % IMPLEMENT
                 
                 % Predicted covariance of map
                 Pmm_pred = Pmm_est; %% <-- IMPLEMENT (use Pmm_est)
@@ -762,7 +762,7 @@ classdef GenericEKF < handle
                 
                 % Innovation
                 innov(1) = z(1) - z_pred(1); %% <-- IMPLEMENT (use z_pred, z)
-                innov(2) = z(2) - z_pred(2); %% <-- IMPLEMENT (use z_pred, z)
+                innov(2) = angdiff(z(2), z_pred(2)); %% <-- IMPLEMENT (use z_pred, z)
 
                     % the map is estimated SLAM case
                     if ekf.seenBefore(js)
