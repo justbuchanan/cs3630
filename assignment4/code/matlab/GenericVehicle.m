@@ -227,6 +227,8 @@ classdef GenericVehicle < handle
         end
 
         function odo = update(veh, u)
+            pause(0.07)
+            
             %Vehicle.update Update the vehicle state
             %
             % ODO = V.update(U) is the true odometry value for

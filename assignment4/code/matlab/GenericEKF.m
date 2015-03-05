@@ -808,7 +808,7 @@ classdef GenericEKF < handle
                 
 
                 % compute innovation covariance
-                S = Hx * P_pred * Hx' + Hw * ekf.W_est; % Justin
+                S = Hx * P_pred * Hx' + Hw*ekf.W_est*Hw'; % Justin
 
                 % compute the Kalman gain
                 K = P_pred*(Hx')*inv(S); % IMPLEMENT
@@ -822,7 +822,7 @@ classdef GenericEKF < handle
                 end
             
                 % update the covariance
-                P_est = (-K*Hx)-P_pred; % <-- IMPLEMENT (use K,S,P_pred); Justin
+                P_est = P_pred-K*S*K'; % <-- IMPLEMENT (use K,S,P_pred); Justin
                 
                 % enforce P to be symmetric
                 P_est = 0.5*(P_est+P_est');

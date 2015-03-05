@@ -40,12 +40,12 @@ classdef DeterministicPath < handle
                 uL=v(1);
                 uR=v(2);
                 
-                scale = 0.1025;  %Change it to accordingly to what you used in Assignment 3 - Done
+                scale = 0.15;  %Change it to accordingly to what you used in Assignment 3 - Done
                 ScaledUL = double(uL)*scale;
                 ScaledUR = double(uR)*scale;
                 
-                r = .01;
-                L = .14;
+                r = .04; % was .035
+                L = 0.8;
                 
                 % calculate speed
                 u(1) =  r.*((ScaledUL+ScaledUR)./2);
