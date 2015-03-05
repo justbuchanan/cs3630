@@ -808,10 +808,10 @@ classdef GenericEKF < handle
                 
 
                 % compute innovation covariance
-                S = Hx*P_pred*Hx' + Hw*ekf.W_est; % Justin
+                S = Hx * P_pred * Hx' + Hw * ekf.W_est; % Justin
 
                 % compute the Kalman gain
-                K = P_pred*Hw*inv(S); % Justin
+                K = P_pred*(Hw')*inv(S); % IMPLEMENT
 
                 % update the state vector
                 x_est = x_pred + K*innov; % Justin

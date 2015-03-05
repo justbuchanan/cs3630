@@ -148,6 +148,7 @@ classdef GenericRangeBearingSensor < Sensor
                 fprintf('Sensor:: feature %d: %.1f %.1f\n', k, z);
             end
             if ~isempty(z) & s.animate
+                jf
                 s.plot(jf);
             end
         end

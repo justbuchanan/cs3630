@@ -3,15 +3,44 @@
 path(path, 'aprilTag');
 
 % Specify the locations of the April tags in the Map
-A =  [36, 0; 84, 0; 120, 18; 0, 32; 0, 84; 120, 78; 100, 102; 70, 98; 19, 116; 40, 88; 40, 98; 58, 122; 70, 98];
+
+dummy = [1, 1];
+
+% tag coords in inches
+% A[tagID] = loc
+A = [58,122; % 1
+    40,98;  % 2
+    70,98;  % 3
+    dummy;  % 4
+    dummy;  % 5
+    dummy;  % 6
+    dummy;  % 7
+    dummy;  % 8
+    dummy;  % 9
+    dummy;  % 10
+    36,0;  % 11
+    84,0;  % 12
+    0,32;  % 13
+    0,84;  % 14
+    120,18;  % 15
+    40,88;    % 16
+    100,102;  % 17
+    120,78;  % 18
+    dummy]; % 19
+    
+% convert inches to meters
+A = A * 0.0254;
+
+% A = [
+%     40, 98;
 %% and a robot with noisy odometry
 
 V=diag([0.1, 1.1*pi/180].^2);
 veh=GenericVehicle(V,'dt',0.1);
-veh.add_driver(DeterministicPath('log-1423547652.txt'));
+veh.add_driver(DeterministicPath('data/log-1424819946-open.txt'));
 
 % Creating the map. It places landmarks according to 'A' matrix.
-map = LandmarkMap(20, A, 5);
+map = LandmarkMap(19, A, 5);
 
 % Creating the sensor.  We firstly define the covariance of the sensor measurements
 % which report distance and bearing angle
