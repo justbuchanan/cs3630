@@ -20,7 +20,25 @@ switch ext
         left = stats(:,8);
         bearing = atan((centroidX - left)/focal_length);
         z = [range bearing ];   % range & bearing measurement       
-        js = stats(:,1);        
+        js = stats(:,1);      
+        
+    case '.txt'
+        stats = dlmread(filename, ' ');
+        
+        % order = top-left top-right bottom-right bottom-left
+        centroid =  [(stats(:,2) + stats(:,4) + stats(:,6) + stats(:,8))./4 (stats(:,3) + stats(:,5) + stats(:,7) + stats(:,9))./4];
+        bottom_left = [stats(:,8) stats(:,9)];
+        dist = centroid-bottom_left;
+        image_distance = sqrt(sum(dist.^2,2));
+        range = focal_length*actual_distance./image_distance;
+        
+        centroidX = centroid(:,1);
+        left = stats(:,8);
+        bearing = atan((centroidX - left)/focal_length);
+        z = [range bearing ];   % range & bearing measurement       
+        js = stats(:,1);      
+        
+
     otherwise
         error('Accepts only pnm files');
 end
