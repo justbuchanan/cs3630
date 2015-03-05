@@ -761,8 +761,8 @@ classdef GenericEKF < handle
                 z_pred = ekf.sensor.h(xv_pred', js)';
                 
                 % Innovation
-                innov(1) = z(1:3) - z_pred(1:3); %% <-- IMPLEMENT (use z_pred, z)
-                innov(2) = z(4:end) - z_pred(4:end); %% <-- IMPLEMENT (use z_pred, z)
+                innov(1) = z(1) - z_pred(1); %% <-- IMPLEMENT (use z_pred, z)
+                innov(2) = z(2) - z_pred(2); %% <-- IMPLEMENT (use z_pred, z)
 
                     % the map is estimated SLAM case
                     if ekf.seenBefore(js)
@@ -822,8 +822,7 @@ classdef GenericEKF < handle
                 end
             
                 % update the covariance
-                sz_x, sz_y = size(K);
-                P_est = (eye(sz_x) - K*S)-P_pred; % <-- IMPLEMENT (use K,S,P_pred); Justin
+                P_est = (-K*S)-P_pred; % <-- IMPLEMENT (use K,S,P_pred); Justin
                 
                 % enforce P to be symmetric
                 P_est = 0.5*(P_est+P_est');
