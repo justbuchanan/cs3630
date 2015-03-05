@@ -811,10 +811,10 @@ classdef GenericEKF < handle
                 S = Hx * P_pred * Hx' + Hw * ekf.W_est; % Justin
 
                 % compute the Kalman gain
-                K = P_pred*(Hw')*inv(S); % IMPLEMENT
+                K = P_pred*(Hx')*inv(S); % IMPLEMENT
 
                 % update the state vector
-                x_est = x_pred + K*innov; % Justin
+                x_est = x_pred + K*innov'; % Justin
             
                 if ekf.estVehicle
                     % wrap heading state for a vehicle
@@ -822,7 +822,7 @@ classdef GenericEKF < handle
                 end
             
                 % update the covariance
-                P_est = (-K*S)-P_pred; % <-- IMPLEMENT (use K,S,P_pred); Justin
+                P_est = (-K*Hx)-P_pred; % <-- IMPLEMENT (use K,S,P_pred); Justin
                 
                 % enforce P to be symmetric
                 P_est = 0.5*(P_est+P_est');

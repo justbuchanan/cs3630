@@ -40,7 +40,7 @@ classdef DeterministicPath < handle
                 uL=v(1);
                 uR=v(2);
                 
-                scale = 22*1.0/(600*1.0);  %Change it to accordingly to what you used in Assignment 3
+                scale = 0.00425;  %Change it to accordingly to what you used in Assignment 3 - Done
                 ScaledUL = double(uL)*scale;
                 ScaledUR = double(uR)*scale;
                 
