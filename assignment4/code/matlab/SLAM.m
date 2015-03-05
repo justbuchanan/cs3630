@@ -8,7 +8,7 @@ A =  [36, 0; 84, 0; 120, 18; 0, 32; 0, 84; 120, 78; 100, 102; 70, 98; 19, 116; 4
 
 V=diag([0.1, 1.1*pi/180].^2);
 veh=GenericVehicle(V,'dt',0.1);
-veh.add_driver(DeterministicPath('log-1423547652.txt'));
+veh.add_driver(DeterministicPath('data/logclosed.txt'));
 
 % Creating the map. It places landmarks according to 'A' matrix.
 map = LandmarkMap(20, A, 5);
