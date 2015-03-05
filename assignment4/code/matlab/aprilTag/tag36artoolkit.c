@@ -36,13 +36,13 @@ either expressed or implied, of the FreeBSD Project.
 
 apriltag_family_t *tag36artoolkit_create()
 {
-    apriltag_family_t *tf = (apriltag_family_t *)calloc(1, sizeof(apriltag_family_t));
+    apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
     tf->name = strdup("artoolkit");
     tf->black_border = 1;
     tf->d = 6;
     tf->h = 7; // not sure.
     tf->ncodes = 512;
-    tf->codes = (uint64_t *)calloc(512, sizeof(uint64_t));
+    tf->codes = calloc(512, sizeof(uint64_t));
 
     tf->codes[0] = 0x0006dc269c27UL;
     tf->codes[1] = 0x0006d4229e26UL;

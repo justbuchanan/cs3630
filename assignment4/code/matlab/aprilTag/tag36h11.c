@@ -37,13 +37,13 @@ either expressed or implied, of the FreeBSD Project.
 
 apriltag_family_t *tag36h11_create()
 {
-   apriltag_family_t *tf = (apriltag_family_t *)calloc(1, sizeof(apriltag_family_t));
+   apriltag_family_t *tf = calloc(1, sizeof(apriltag_family_t));
    tf->name = strdup("tag36h11");
    tf->black_border = 1;
    tf->d = 6;
    tf->h = 11;
    tf->ncodes = 587;
-   tf->codes = (uint64_t *)calloc(587, sizeof(uint64_t));
+   tf->codes = calloc(587, sizeof(uint64_t));
    tf->codes[0] = 0x0000000d5d628584UL;
    tf->codes[1] = 0x0000000d97f18b49UL;
    tf->codes[2] = 0x0000000dd280910eUL;

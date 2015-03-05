@@ -240,8 +240,8 @@ int pt_compare_theta(const void *_a, const void *_b)
 
 int err_compare_descending(const void *_a, const void *_b)
 {
-    const double *a = (const double *) _a;
-    const double *b = (const double *) _b;
+    const double *a =  _a;
+    const double *b =  _b;
 
     return ((*a) < (*b)) ? 1 : -1;
 }
@@ -447,9 +447,9 @@ int quad_segment_agg(apriltag_detector_t *td, zarray_t *cluster, struct line_fit
 
     int rvalloc_pos = 0;
     int rvalloc_size = 3*sz;
-    struct remove_vertex *rvalloc = (struct remove_vertex *) calloc(rvalloc_size, sizeof(struct remove_vertex));
+    struct remove_vertex *rvalloc = calloc(rvalloc_size, sizeof(struct remove_vertex));
 
-    struct segment *segs = (struct segment *)calloc(sz, sizeof(struct segment));
+    struct segment *segs = calloc(sz, sizeof(struct segment));
 
     // populate with initial entries
     for (int i = 0; i < sz; i++) {
@@ -620,7 +620,7 @@ int fit_quad(apriltag_detector_t *td, image_u8_t *im, zarray_t *cluster, struct 
     // Step 2. Precompute statistics that allow line fit queries to be
     // efficiently computed for any contiguous range of indices.
 
-    struct line_fit_pt *lfps = (struct line_fit_pt *)calloc(sz, sizeof(struct line_fit_pt));
+    struct line_fit_pt *lfps = calloc(sz, sizeof(struct line_fit_pt));
 
     for (int i = 0; i < sz; i++) {
         struct pt *p;
@@ -909,8 +909,8 @@ image_u8_t *threshold(apriltag_detector_t *td, image_u8_t *im)
     int tw = w/tilesz + 1;
     int th = h/tilesz + 1;
 
-    uint8_t *im_max = (uint8_t *)calloc(tw*th, sizeof(uint8_t));
-    uint8_t *im_min = (uint8_t *)calloc(tw*th, sizeof(uint8_t));
+    uint8_t *im_max = calloc(tw*th, sizeof(uint8_t));
+    uint8_t *im_min = calloc(tw*th, sizeof(uint8_t));
 
     // first, collect min/max statistics for each tile
     for (int ty = 0; ty < th; ty++) {
@@ -1012,8 +1012,8 @@ image_u8_t *threshold_bayer(apriltag_detector_t *td, image_u8_t *im)
 
     uint8_t *im_max[4], *im_min[4];
     for (int i = 0; i < 4; i++) {
-        im_max[i] = (uint8_t *)calloc(tw*th, sizeof(uint8_t));
-        im_min[i] = (uint8_t *)calloc(tw*th, sizeof(uint8_t));
+        im_max[i] = calloc(tw*th, sizeof(uint8_t));
+        im_min[i] = calloc(tw*th, sizeof(uint8_t));
     }
 
     for (int ty = 0; ty < th; ty++) {

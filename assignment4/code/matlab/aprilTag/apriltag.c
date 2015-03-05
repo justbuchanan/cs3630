@@ -39,17 +39,17 @@ either expressed or implied, of the FreeBSD Project.
 #include <inttypes.h>
 #include <sys/time.h>
 
-#include "image_u8.h"
-#include "image_u32.h"
-#include "zhash.h"
-#include "zarray.h"
-#include "matd.h"
-#include "homography.h"
-#include "timeprofile.h"
-#include "math_util.h"
+#include "common/image_u8.h"
+#include "common/image_u32.h"
+#include "common/zhash.h"
+#include "common/zarray.h"
+#include "common/matd.h"
+#include "common/homography.h"
+#include "common/timeprofile.h"
+#include "common/math_util.h"
 #include "g2d.h"
 
-#include "postscript_utils.h"
+#include "common/postscript_utils.h"
 
 #ifndef PI
 #define PI 3.1415926535897932384626
@@ -110,7 +110,7 @@ void quad_destroy(struct quad *quad)
 
 struct quad *quad_copy(struct quad *quad)
 {
-    struct quad *q = (struct quad *)calloc(1, sizeof(struct quad));
+    struct quad *q = calloc(1, sizeof(struct quad));
     memcpy(q, quad, sizeof(struct quad));
     if (quad->H)
         q->H = matd_copy(quad->H);
@@ -148,7 +148,7 @@ void quick_decode_init(apriltag_family_t *family, int maxhamming)
     assert(family->impl == NULL);
     assert(family->ncodes < 65535);
 
-    struct quick_decode *qd = (struct quick_decode *)calloc(1, sizeof(struct quick_decode));
+    struct quick_decode *qd = calloc(1, sizeof(struct quick_decode));
     int capacity = family->ncodes;
 
     int nbits = family->d * family->d;
@@ -167,7 +167,7 @@ void quick_decode_init(apriltag_family_t *family, int maxhamming)
 //    printf("capacity %d, size: %.0f kB\n",
 //           capacity, qd->nentries * sizeof(struct quick_decode_entry) / 1024.0);
 
-    qd->entries = (struct quick_decode_entry *)calloc(qd->nentries, sizeof(struct quick_decode_entry));
+    qd->entries = calloc(qd->nentries, sizeof(struct quick_decode_entry));
     if (qd->entries == NULL) {
         printf("apriltag.c: failed to allocate hamming decode table. Reduce max hamming size.\n");
         exit(-1);
@@ -792,7 +792,7 @@ static void quad_decode_task(void *_u)
 
             float decision_margin = quad_decode(family, im, quad, &entry);
             if (entry.hamming < 255) {
-                apriltag_detection_t *det = (apriltag_detection_t *)calloc(1, sizeof(apriltag_detection_t));
+                apriltag_detection_t *det = calloc(1, sizeof(apriltag_detection_t));
 
                 det->family = family;
                 det->id = entry.id;
