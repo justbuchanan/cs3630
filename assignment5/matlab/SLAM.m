@@ -44,17 +44,16 @@ clf; map.plot()
 % and then overlay the path actually taken by the vehicle
 veh.plot_xy('b');
 % and then overlay the path estimated by the filter
-%%% ekf.plot_xy('r');
+ekf.plot_xy('r');
 % which we see are pretty close
 
 % Now let's plot the error in estimating the pose
-%%% ekf.plot_error()
+% ekf.plot_error()
 % and this is overlaid with the estimated covariance of the error.
 
 % Remember that the SLAM filter has not only estimated the robot's pose, it has
 % simultaneously estimated the positions of the landmarks as well.  How well did it
-% do at that task?  We will show the landmarks in the map again
-%%% map.plot();
+% do at that task?  We will show the landmarks in the map againmap.plot();
 % and this time overlay the estimated landmark (with a +) and the 3sigma 
 % uncertainty bounds as green ellipses
-%%% ekf.plot_map(3,'g');
+ekf.plot_map(3,'g');
