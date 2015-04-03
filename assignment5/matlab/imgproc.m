@@ -7,6 +7,8 @@ s1 = isurf(im1);
 s2 = isurf(im2);
 m = s1.match(s2);
 
+camnew = CentralCamera('image', im1);
+
 F = m.ransac(@fmatrix, 1e-4, 'verbose');
 idisp({im1, im2})
 m.inlier.subset(100).plot('g')
@@ -15,8 +17,9 @@ K = [1211.2959, 0, 657.15924;
     0, 1206.00512, 403.17667;
     0, 0, 1];
 
-E = K'*F*K;
-[R, t] = tr2rt(E)
+E = K'*F*K
+sol = camnew.invE(E, [0,0,10]')
+[R, t] = tr2rt(sol)
 
 % 
 % 

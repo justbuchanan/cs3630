@@ -73,7 +73,7 @@ classdef CameraDriver < handle
                         
                         if length(driver.prevFilename) ~= 0
                             [R, t] = imgproc(driver.prevFilename, cameraFile);
-                            angles = tr2rpy(R, 'rad')
+                            angles = tr2rpy(R, 'deg')
                             dx = [t; 0];
                         else
                             dx = [0 0 0]'; 
