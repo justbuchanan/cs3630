@@ -6,6 +6,7 @@ classdef CameraDriver < handle
         log
         nrLines
         counter
+        prevFilename
     end
     
     methods
@@ -14,6 +15,8 @@ classdef CameraDriver < handle
             % Constructor
             fileID = fopen(filename);
             driver.log = textscan(fileID, '%d %d %s');
+            
+            driver.prevFilename = '';
             
             driver.nrLines=size(driver.log{1},1)
             fprintf(1,'read %d lines from %s\n',driver.nrLines,filename);
@@ -52,10 +55,10 @@ classdef CameraDriver < handle
 %                 % calculate speed
 %                 u(1) =  r*((ScaledUL+ScaledUR)/2.0)*10;
 %                 u(2) = (r/L)*(ScaledUR-ScaledUL)*1.0;
-                
+
 
                 while 1
-                    cameraFile = driver.log{3}(driver.counter);
+                    cameraFile = driver.log{3}(driver.counter)
                     if cameraFile{1} == '0'
                         if driver.counter> driver.nrLines
                             break;
@@ -63,14 +66,20 @@ classdef CameraDriver < handle
                             driver.counter = driver.counter + 1;
                         end
                     else
+                        cameraFile = char(cameraFile);
+                        
                         %% TODO: do camera things and calculate dx
                         % set previous image features
                         
-                        
-                        
-                        
-                        
-                        dx = [1 1 0]'; % FIXME: dummy
+                        if length(driver.prevFilename) ~= 0
+                            [R, t] = imgproc(driver.prevFilename, cameraFile);
+                            angles = tr2rpy(R, 'rad')
+                            dx = [t; 0];
+                        else
+                            dx = [0 0 0]'; 
+                        end
+                        driver.prevFilename = cameraFile;
+                     
                         
                         break;
                     end
