@@ -1,5 +1,7 @@
-im1  = iread('data/pic-1427427441.jpg', 'mono', 'double');
-im2  = iread('data/pic-1427427439.jpg', 'mono', 'double');
+function [R,t] = imgproc(filename1, filename2)
+
+im1  = iread(filename1, 'mono', 'double');
+im2  = iread(filename2, 'mono', 'double');
 
 s1 = isurf(im1);
 s2 = isurf(im2);
