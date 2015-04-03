@@ -9,9 +9,22 @@ m = s1.match(s2);
 
 % camnew = CentralCamera('image', im1);
 
-F = m.ransac(@fmatrix, 1e-4, 'verbose');
+% if length(m) < 7
+%     R = [0 0 0; 0 0 0; 0 0 0];
+%     t = [0 0]';
+% end
+
+
+try
+    F = m.ransac(@fmatrix, 1e-4, 'verbose');
+catch
+    R = [0 0 0; 0 0 0; 0 0 0];
+    t = [0 0]';
+    return;
+end
+
 idisp({im1, im2})
-m.inlier.subset(100).plot('g')
+% m.inlier.subset(100).plot('g')
 
 K = [1211.2959, 0, 657.15924;
     0, 1206.00512, 403.17667;
@@ -20,7 +33,6 @@ K = [1211.2959, 0, 657.15924;
 E = K'*F*K
 % sol = camnew.invE(E, [0,0,10]')
 % [R, t] = tr2rt(sol)
-
 
 
 
@@ -46,5 +58,4 @@ s(:,:,2) = inv( [R2 t2; 0 0 0 1] );
 
 % [R,t] = R1, t1
 [R, t] = tr2rt(s(:,:,2));
-t = t(2:3); % FIXME: which 2 of the 3 components in t do we want to extract?
-
+t = t(1:2); % FIXME: which 2 of the 3 components in t do we want to extract?

@@ -58,6 +58,9 @@ classdef CameraDriver < handle
 
 
                 while 1
+                    if driver.counter>driver.nrLines
+                        return;
+                    end
                     cameraFile = driver.log{3}(driver.counter)
                     if cameraFile{1} == '0'
                         if driver.counter> driver.nrLines
