@@ -235,17 +235,25 @@ classdef GenericVehicle < handle
             % Notes::
             % - Appends new state to state history property x_hist.
             % - Odometry is also saved as property odometry.
-            xp = veh.x; % previous state
-            veh.x(1) = veh.x(1) + u(1)*veh.dt*cos(veh.x(3));
-            veh.x(2) = veh.x(2) + u(1)*veh.dt*sin(veh.x(3));
-            veh.x(3) = veh.x(3) + veh.dt*u(2);
+
+
+
+            % difference in x, y, theta
+            dx = veh.driver.demand();
+
+
+            % veh.x = [x, y, theta]'
+
+
+            xp = veh.x % previous state
+            % veh.x(1) = veh.x(1) + u(1)*veh.dt*cos(veh.x(3));
+            % veh.x(2) = veh.x(2) + u(1)*veh.dt*sin(veh.x(3));
+            % veh.x(3) = veh.x(3) + veh.dt*u(2);
+            veh.x = veh.x + dx;
             odo = [colnorm(veh.x(1:2)-xp(1:2)) veh.x(3)-xp(3)];
             veh.odometry = odo;
             
             veh.x_hist = [veh.x_hist; veh.x'];   % maintain history
-            
-            
-
         end
 
 
@@ -284,6 +292,10 @@ classdef GenericVehicle < handle
         end
 
         function [odo, sensor_measurement] = step(veh, varargin)
+            
+            % disable measurements - the camera just does odometry
+            sensor_measurement = '';
+            
             %Vehicle.step Advance one timestep
             %
             % ODO = V.step(SPEED, STEER) updates the vehicle state for one timestep
@@ -299,11 +311,8 @@ classdef GenericVehicle < handle
             %
             % See also Vehicle.control, Vehicle.update, Vehicle.add_driver.
 
-            % get the control input to the vehicle from either passed demand or driver
-            [u, sensor_measurement] = veh.control(varargin{:});
-
-            % compute the true odometry and update the state
-            odo = veh.update(u);
+            % compute the new odometry based on the new camera image
+            odo = veh.update();
 
             % add noise to the odometry
             if veh.V
@@ -311,37 +320,6 @@ classdef GenericVehicle < handle
             end
         end
 
-
-        function [u, sensor_measurement] = control(veh, speed, steer)
-            %Vehicle.control Compute the control input to vehicle
-            %
-            % U = V.control(SPEED, STEER) is a control input (1x2) = [speed,steer]
-            % based on provided controls SPEED,STEER to which speed and steering angle
-            % limits have been applied.
-            %
-            % U = V.control() as above but demand originates with a "driver" object if
-            % one is attached, the driver's DEMAND() method is invoked. If no driver is
-            % attached then speed and steer angle are assumed to be zero.
-            %
-            % See also Vehicle.step, RandomPath.
-            if nargin < 2
-                % if no explicit demand, and a driver is attached, use
-                % it to provide demand
-                 if ~isempty(veh.driver)
-                    ret = veh.driver.demand();
-                    u = ret.u;
-                    sensor_measurement = ret.measurement;
-                else
-                    % no demand, do something safe
-                    u = [0;0];
-                    sensor_measurement = '';
-                end
-            end            
-
-            % clip both controls
-            u(1) = min(200, max(-200, u(1)));
-            u(2) = min(200, max(-200, u(2)));      
-        end
 
         function p = run(veh, nsteps)
             %Vehicle.run Run the vehicle simulation
@@ -376,27 +354,7 @@ classdef GenericVehicle < handle
             p = veh.x_hist;
         end
 
-        % TODO run and run2 should become superclass methods...
-
-        function p = run2(veh, T, x0, speed, steer)
-            %Vehicle.run2 Run the vehicle simulation with control inputs
-            %
-            % P = V.run2(T, X0, SPEED, STEER) runs the vehicle model for a time T with
-            % speed SPEED and steering angle STEER.  P (Nx3) is the path followed and
-            % each row is (x,y,theta).
-            %
-            % Notes::
-            % - Faster and more specific version of run() method.
-            % - Used by the RRT planner.
-            %
-            % See also Vehicle.run, Vehicle.step, RRT.
-            veh.init(x0);
-
-            for i=1:(T/veh.dt)
-                veh.update([speed steer]);
-            end
-            p = veh.x_hist;
-        end
+        
 
         function h = plot(veh, varargin)
         %Vehicle.plot Plot vehicle

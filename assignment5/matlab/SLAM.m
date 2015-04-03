@@ -10,7 +10,7 @@ A =  [0,0];
 
 V=diag([0.1, 1.1*pi/180].^2);
 veh=GenericVehicle(V,'dt',0.1);
-veh.add_driver(DeterministicPath('data/withoutpics.txt'));
+veh.add_driver(CameraDriver('data/withpics.txt'));
 
 % Creating the map. It places landmarks according to 'A' matrix.
 map = LandmarkMap(20, A, 5);
