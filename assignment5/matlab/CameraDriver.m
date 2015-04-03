@@ -72,9 +72,9 @@ classdef CameraDriver < handle
                         % set previous image features
                         
                         if length(driver.prevFilename) ~= 0
-                            [R, t] = imgproc(driver.prevFilename, cameraFile);
-                            angles = tr2rpy(R, 'deg')
-                            dx = [t; 0];
+                            [R,t] = imgproc(driver.prevFilename, cameraFile);
+                            angles = tr2eul(R)
+                            dx = [t; angles(1)];
                         else
                             dx = [0 0 0]'; 
                         end
