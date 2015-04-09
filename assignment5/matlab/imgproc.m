@@ -7,60 +7,55 @@ s1 = isurf(im1);
 s2 = isurf(im2);
 m = s1.match(s2);
 
-camnew = CentralCamera('image', im1);
+% camnew = CentralCamera('image', im1);
 
-F = m.ransac(@fmatrix, 1e-4, 'verbose');
+% if length(m) < 7
+%     R = [0 0 0; 0 0 0; 0 0 0];
+%     t = [0 0]';
+% end
+
+
+try
+    F = m.ransac(@fmatrix, 1e-4, 'verbose');
+catch
+    R = [0 0 0; 0 0 0; 0 0 0];
+    t = [0 0]';
+    return;
+end
+
 idisp({im1, im2})
-m.inlier.subset(100).plot('g')
+% m.inlier.subset(100).plot('g')
 
 K = [1211.2959, 0, 657.15924;
     0, 1206.00512, 403.17667;
     0, 0, 1];
 
 E = K'*F*K
-sol = camnew.invE(E, [0,0,10]')
-[R, t] = tr2rt(sol)
+% sol = camnew.invE(E, [0,0,10]')
+% [R, t] = tr2rt(sol)
 
-% 
-% 
-% camold = CentralCamera('image', im1);
-% %camnew = CentralCamera('image', im2);
-% 
-% camold.invE(E)
-% inv(camold.T) * cam2.T
-% 
-% 
-% 
-% m.show
-% idisp({im1, im2})
-% 
-% m.inlier.plot('w')
-% 
-% [m,corresp] = s1.match(s2);
-% 
-% m2 = s1.match(s2, 'thresh', []);
-% ihist(m2.distance, 'normcdf')
-% 
-% T1 = transl(-0.1, 0, 0) * troty(0.4);
-% cam1 = CentralCamera('name', 'camera 1', 'default', ...
-% 0.002, 'pose', T1)
-% 
-% T2 = transl(0.1, 0,0)*troty(-0.4);
-% cam2 = CentralCamera('name', 'camera 2', 'default', ...
-% 0.002, 'pose', T2);
-% 
-% %% RANSAC not performed on p1 and p2 - so we cannot have outliers
-% F = fmatrix(p1, p2)
-% rank(F)
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
+
+
+[U,S,V] = svd(E);
+
+% Ma etal solution, p116, p120-122
+% Fig 5.2 (p113), is wrong, (R,t) is from camera 2 to 1
+if det(V) < 0
+    V = -V;
+    S = -S;
+end
+if det(U) < 0
+    U = -U;
+    S = -S;
+end
+R1 = U*rotz(pi/2)'*V';
+R2 = U*rotz(-pi/2)'*V';
+t1 = vex(U*rotz(pi/2)*S*U');
+t2 = vex(U*rotz(-pi/2)*S*U');
+% invert (R,t) so its from camera 1 to 2
+s(:,:,1) = inv( [R1 t1; 0 0 0 1] );
+s(:,:,2) = inv( [R2 t2; 0 0 0 1] );
+
+% [R,t] = R1, t1
+[R, t] = tr2rt(s(:,:,2));
+t = t(1:2); % FIXME: which 2 of the 3 components in t do we want to extract?

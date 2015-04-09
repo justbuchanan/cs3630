@@ -58,6 +58,9 @@ classdef CameraDriver < handle
 
 
                 while 1
+                    if driver.counter>driver.nrLines
+                        return;
+                    end
                     cameraFile = driver.log{3}(driver.counter)
                     if cameraFile{1} == '0'
                         if driver.counter> driver.nrLines
@@ -72,9 +75,9 @@ classdef CameraDriver < handle
                         % set previous image features
                         
                         if length(driver.prevFilename) ~= 0
-                            [R, t] = imgproc(driver.prevFilename, cameraFile);
-                            angles = tr2rpy(R, 'deg')
-                            dx = [t; 0];
+                            [R,t] = imgproc(driver.prevFilename, cameraFile);
+                            angles = tr2eul(R)
+                            dx = [t; angles(1)];
                         else
                             dx = [0 0 0]'; 
                         end

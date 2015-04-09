@@ -239,7 +239,7 @@ classdef GenericVehicle < handle
 
 
             % difference in x, y, theta
-            dx = veh.driver.demand();
+            dx = veh.driver.demand()
 
 
             % veh.x = [x, y, theta]'
