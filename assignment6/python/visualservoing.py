@@ -2,6 +2,7 @@ import time
 from Scribbler2 import *
 import cv2
 import numpy as np
+import math
 from matplotlib import pyplot as plt
 
 
@@ -68,6 +69,19 @@ def find_black_square(imgPath, debug = False):
         cv2.imshow('contours', cntAnnotatedImg)
         
         cv2.waitKey(0)
+
+    # sort by ascending x-value
+    square = sorted(square, key=lambda pt: pt[0][0])
+    
+    # extract left and right sides and sort by ascending y value
+    leftPts = sorted(square[0:2], key=lambda pt: pt[0][1])
+    rightPts = sorted(square[2:4], key=lambda pt: pt[0][1])
+
+    # rearrange in order of increasing quadrant (pretending origin is at the center of the square)
+    square = [rightPts[0], leftPts[0], leftPts[1], rightPts[1]]
+
+    # convert from np.array to tuple
+    square = [(pt[0][0], pt[0][1]) for pt in square]
 
     return square, cntAnnotatedImg
 
