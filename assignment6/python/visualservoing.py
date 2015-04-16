@@ -1,13 +1,52 @@
 import time
-from Scribbler2 import *
 import cv2
+from Scribbler2 import *
 import numpy as np
 import math
 from matplotlib import pyplot as plt
 
 
-# Connect to the scribbler
-# Set timeout to 0 to read instantly, non-blocking
+## Connect to the scribbler
+##Set timeout to 0 to read instantly, non-blocking
+#
+# fname = "log-%d.txt" % time.time()
+#
+# s = Scribbler2('/dev/tty.Fluke2-0610-Fluke2',fname)
+#
+# # Set timeout to zero
+# print 'Connected!'
+# s.setIRPower(140)
+# s.setForwardness(1)
+# # Create a list of commands
+# # Command is a list [cmd, leftMotor, rightMotor, time]
+# # Setting motors to 200 will drive
+# # forward with the fluke facing forward
+#
+# # Run the robot
+# commands = []
+# commands.append([100, 100, 1])
+# commands.append([0,0,1])
+# s.runCommands(commands);
+#
+#
+#
+# ## Take picture
+# pic_fname = "pic-%d.jpg" % time.time()
+# picture = s.takePicture('jpeg');
+# s.savePicture(picture, pic_fname)
+#
+#
+# # Run the robot again
+# commands = []
+# commands.append([100, 100, 1])
+# commands.append([0,0,1])
+# s.runCommands(commands);
+#
+#
+# ## Take picture
+# pic_fname = "pic-%d.jpg" % time.time()
+# picture = s.takePicture('jpeg');
+# s.savePicture(picture, pic_fname)
 
 # TODO: uncomment to connect to scribbler robot
 # fname = "log-%d.txt" % time.time()
@@ -48,18 +87,46 @@ def find_black_square(imgPath, debug = False):
     cnts = sorted(cnts, key = cv2.contourArea, reverse = True)
 
     # find the largest rectangle in the contours list
-    square = None
+
     for c in cnts[1:]:
         peri = cv2.arcLength(c, True)
         approx = cv2.approxPolyDP(c, 0.02 * peri, True)
 
         if len(approx) == 4:
-            square = approx
+            corners = approx
             break
 
     # draw the original image overlaid with the contour we think is the target black rect
     cntAnnotatedImg = origImg.copy()
-    cv2.drawContours(cntAnnotatedImg, [square], -1, (0,255,0), 3)
+    cv2.drawContours(cntAnnotatedImg, [corners], -1, (0,255,0), 3)
+
+    # sort by ascending x-value
+    corners = sorted(corners, key=lambda pt: pt[0][0])
+
+    # extract left and right sides and sort by ascending y value
+    leftPts = sorted(corners[0:2], key=lambda pt: pt[0][1])
+    # print "leftPts:"
+    # print leftPts
+    rightPts = sorted(corners[2:4], key=lambda pt: pt[0][1])
+    # print "rightPts:"
+    # print rightPts
+
+    # rearrange in order of increasing quadrant (pretending origin is at the center of the corners)
+    corners = np.ndarray(shape=(4,2), dtype=int, order='C')
+    corners[0] = rightPts[0]
+    corners[1] = leftPts[0]
+    corners[2] = leftPts[1]
+    corners[3] = rightPts[1]
+
+    # print "corners ordered:"
+    # print corners
+
+    square = np.zeros((4,2), np.float32)
+    for a in range(len(corners)):
+        square[a,1] = corners[a][1]
+        square[a,0] = corners[a][0]
+
+    square = square.reshape(-1,2)
 
     if debug:
         cv2.imshow('original', origImg)
@@ -70,35 +137,55 @@ def find_black_square(imgPath, debug = False):
         
         cv2.waitKey(0)
 
-    # sort by ascending x-value
-    square = sorted(square, key=lambda pt: pt[0][0])
-    
-    # extract left and right sides and sort by ascending y value
-    leftPts = sorted(square[0:2], key=lambda pt: pt[0][1])
-    rightPts = sorted(square[2:4], key=lambda pt: pt[0][1])
-
-    # rearrange in order of increasing quadrant (pretending origin is at the center of the square)
-    square = [rightPts[0], leftPts[0], leftPts[1], rightPts[1]]
 
     # convert from np.array to tuple
-    square = [(pt[0][0], pt[0][1]) for pt in square]
+    # square = np.array([[pt[0][0], pt[0][1]] for pt in square])
 
     return square, cntAnnotatedImg
 
+# returns F, R, T given an image of a 4" x 4" black square
+# F is a boolean representing found
+# R is Z rotation in radians
+# T is a 2x1 vector for translation in inches
+# X is in the left direction on the square
+# Y is in the down direction
+# Z is in the direction into the square
+# (0, 0, 0) origin (goal) is in the center of the black square
+def getRT(corners):
+    # defines the corners of the object we are tracking in x, y, z space in inches
+    objectpoints = np.array([[1, -1, 0], [-1, -1, 0], [-1, 1, 0], [1, 1, 0]], np.float32)
+    # objectpoints = np.array([[12, 8, 2], [12, 8, -2], [12, 4, -2], [12, 4, 2]], np.float32)
+    kmat = np.array([[1211.2959, 0, 657.15924], [0, 1206.00512, 403.17667], [0, 0, 1]])
+    F, R, T = cv2.solvePnP(objectpoints, corners, kmat, None)
+    # print "Rvec"
+    # print R
+    # print "Tvec"
+    # print T
+    print "R"
+    R = R[1]
+    print R #Y rotation
+
+    # print "T"
+    # print T
+    print "T"
+    T = np.append(T[0], T[2])
+    print T
+
+
+    return F, R, T
 
 
 # demo!
 sq1, img1 = find_black_square('../start.jpg')
 sq2, img2 = find_black_square('../goal.jpg')
-print("Square 1: " + str(sq1))
-print("Square 2: " + str(sq2))
+F, R, T = getRT(sq1)
 cv2.imshow('Start', img1)
+
+cv2.waitKey()
 cv2.imshow('Goal', img2)
-cv2.waitKey(0)
+F, R, T = getRT(sq2)
 
-
-
-
+cv2.waitKey()
 
 # # Run the robot
 # commands = []
@@ -111,6 +198,21 @@ cv2.waitKey(0)
 # picture = s.takePicture('jpeg');
 # s.savePicture(picture, pic_fname)
 
+
+## Image Transform Stuff
+# mat = cv2.Mat()
+
+# Essential Matrix
+# emat = np.matrix()
+
+# Intrinsic Matrix
+# kmat = np.matrix([1211.2959, 0, 657.15924], [0, 1206.00512, 403.17667], [0, 0, 1])
+
+# Fundamental Matrix
+# F = (K^-1)^T * E * (K^-1)
+# kmat_inv = np.linalg.inv(kmat)
+# fmat = np.dot(np.transpose(kmat_inv), emat)
+# fmat = np.dot(fmat, kmat_inv)
 
 # # Run the robot again
 # commands = []
@@ -125,5 +227,5 @@ cv2.waitKey(0)
 # s.savePicture(picture, pic_fname)
 
 
-# ## Close (Do not remove this line)
+# # Close (Do not remove this line)
 # s.close();
