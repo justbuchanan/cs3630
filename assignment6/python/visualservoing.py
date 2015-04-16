@@ -98,6 +98,35 @@ cv2.waitKey(0)
 
 
 
+# get the sign of a number
+def sgn(num):
+    return 1 if num >= 0 else -1
+
+
+# robot drive constants
+DriveScale = 0.15
+WheelRadius = 0.04
+WheelDist = 0.08;
+
+
+# rotate in place a given number of radians
+def drive_rotate(scrib, rad):
+    uL = -100*sgn(rad)
+    uR = 100*sgn(rad)
+    radPerSec = scale*(uL-uR)*WheelRadius/WheelDist
+    time = rad / radPerSec
+
+    scrib.runCommands([[uL, uR, time]])
+
+
+# move forward a given distance (in meters)
+def drive_forward(scrib, meters):
+    u = 100
+    speed = u*DriveScale*WheelRadius
+    time = meters / speed
+
+    scrib.runCommands([[u, u, time]])
+
 
 
 # # Run the robot
