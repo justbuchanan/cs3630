@@ -171,7 +171,6 @@ def getRT(corners):
     T = np.append(T[0], T[2])
     print T
 
-
     return F, R, T
 
 
@@ -185,7 +184,35 @@ cv2.waitKey()
 cv2.imshow('Goal', img2)
 F, R, T = getRT(sq2)
 
-cv2.waitKey()
+# get the sign of a number
+def sgn(num):
+    return 1 if num >= 0 else -1
+
+
+# robot drive constants
+DriveScale = 0.15
+WheelRadius = 0.04
+WheelDist = 0.08;
+
+
+# rotate in place a given number of radians
+def drive_rotate(scrib, rad):
+    uL = -100*sgn(rad)
+    uR = 100*sgn(rad)
+    radPerSec = scale*(uL-uR)*WheelRadius/WheelDist
+    time = rad / radPerSec
+
+    scrib.runCommands([[uL, uR, time]])
+
+
+# move forward a given distance (in meters)
+def drive_forward(scrib, meters):
+    u = 100
+    speed = u*DriveScale*WheelRadius
+    time = meters / speed
+
+    scrib.runCommands([[u, u, time]])
+
 
 # # Run the robot
 # commands = []
