@@ -156,8 +156,8 @@ def getRT(corners):
 
 
 def disttoline(vlinesize):
-    linesizeatgoal = 186
-    return 12*186/vlinesize
+    linesizeatgoal = 250
+    return 12*linesizeatgoal/vlinesize
 
 def thetaofbot(avgvlinesize, hlinesize):
     print "hlinesize"
