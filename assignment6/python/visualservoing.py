@@ -114,21 +114,53 @@ def getRT(corners):
     centery = sum(corners[i][1] for i in range(4))/4
     center = [centerx, centery]
 
+    sizeatgoal = None
     heightleft = corners[2][1] - corners[1][1]
     heightright = corners[3][1] - corners[0][1]
+    heightavg = (heightleft + heightright)/2
+    heightdif =  heightright - heightleft
+
+    lengthtop = corners[0][0] - corners[1][0]
+    lengthbot = corners[3][0] - corners[2][0]
+    widthavg = (lengthtop + lengthbot)/2
 
 
+    print "heightavg"
+    print heightavg
 
+    print "heightdif"
+    print heightdif
+
+    print "widthavg"
+    print widthavg
+
+
+    print "theta"
+    print heightdif/heightavg
     # Xpix = 1280 Ypix = 800
 
 
     # print corners
     # print centerx
     # print centery
+    print "disttol"
+    print disttoline(heightleft)
+    print "disttor"
+    print disttoline(heightright)
+    if heightleft > heightright:
+        theta = -1
+    else:
+        theta = 1
+    theta *= thetaofbot(heightavg, widthavg)
+    return theta, np.array([disttoline(heightavg) * np.sin(theta), -disttoline(heightavg) * np.cos(theta)])
 
-    return F, R, T
 
+def disttoline(vlinesize):
+    linesizeatgoal = 186
+    return 12*186/vlinesize
 
+def thetaofbot(avgvlinesize, hlinesize):
+    return np.arccos(hlinesize/avgvlinesize)
 # # demo!
 # sq1, img1 = find_black_square('../start.jpg', True)
 # # sq2, img2 = find_black_square('../goal.jpg')
@@ -149,6 +181,25 @@ def getRT(corners):
 # # cv2.imshow('8', img8)
 # # F, R, T = getRT(sq8)
 # cv2.waitKey()
+# demo!
+# sq1, img1 = find_black_square('../start.jpg')
+sq2, img2 = find_black_square('test-images/pic-6.jpg')
+R, T = getRT(sq2)
+print "R"
+print R
+print "T"
+print T
+cv2.imshow('start', img2)
+cv2.waitKey()
+# sq5, img5 = find_black_square('test-images/pic-5.jpg')
+# F, R, T = getRT(sq5)
+# cv2.imshow('5', img5)
+# sq6, img6 = find_black_square('test-images/pic-6.jpg')
+# R, T = getRT(sq6)
+# cv2.imshow('6', img6)
+# sq8, img8 = find_black_square('test-images/pic-8.jpg')
+# cv2.imshow('8', img8)
+# F, R, T = getRT(sq8)
 
 #
 # cv2.waitKey()
