@@ -109,7 +109,7 @@ def getRT(corners):
 
     F = True
     if None is corners:
-        F = None
+        F = False
     centerx = sum(corners[i][0] for i in range(4))/4
     centery = sum(corners[i][1] for i in range(4))/4
     center = [centerx, centery]
@@ -152,7 +152,7 @@ def getRT(corners):
     else:
         theta = 1
     theta *= thetaofbot(heightavg, widthavg)
-    return theta, np.array([disttoline(heightavg) * np.sin(theta), -disttoline(heightavg) * np.cos(theta)])
+    return F, theta, np.array([disttoline(heightavg) * np.sin(theta), -disttoline(heightavg) * np.cos(theta)])
 
 
 def disttoline(vlinesize):
@@ -160,6 +160,12 @@ def disttoline(vlinesize):
     return 12*186/vlinesize
 
 def thetaofbot(avgvlinesize, hlinesize):
+    print "hlinesize"
+    print hlinesize
+    print "avgvlinesize"
+    print avgvlinesize
+    if (hlinesize >= avgvlinesize):
+        return 0
     return np.arccos(hlinesize/avgvlinesize)
 # # demo!
 # sq1, img1 = find_black_square('../start.jpg', True)
@@ -291,10 +297,12 @@ def main():
     while True:
         # take a picture
         picname = takePicture(s, 1)
+        print "Took a picture (number " + str(picnum) + ")!"
         picnum += 1
 
         corners, cntAnnotatedImg = find_black_square(picname)
         found, rot, trans = getRT(corners)
+        print "getRT() returned " + str(rot) + ", " + str(trans)
 
         if not found:
             printf("Error: getRT() failed... exiting")
