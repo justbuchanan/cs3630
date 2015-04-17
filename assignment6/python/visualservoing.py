@@ -32,7 +32,6 @@ def find_black_square(imgPath, debug = False):
     cnts = sorted(cnts, key = cv2.contourArea, reverse = True)
 
     # find the largest rectangle in the contours list
-
     for c in cnts[1:]:
         peri = cv2.arcLength(c, True)
         approx = cv2.approxPolyDP(c, 0.02 * peri, True)
@@ -120,50 +119,42 @@ def getRT(corners):
     return F, R, T
 
 
-# demo!
-sq1, img1 = find_black_square('../start.jpg')
-sq2, img2 = find_black_square('../goal.jpg')
-F, R, T = getRT(sq1)
-cv2.imshow('Start', img1)
+# # demo!
+# sq1, img1 = find_black_square('../start.jpg', True)
+# # sq2, img2 = find_black_square('../goal.jpg')
+# # F, R, T = getRT(sq1)
+# cv2.imshow('Start', img1)
 
-cv2.waitKey()
-cv2.imshow('Goal', img2)
-F, R, T = getRT(sq2)
+# cv2.waitKey()
+# cv2.imshow('Goal', img2)
+# F, R, T = getRT(sq2)
 
 # get the sign of a number
 def sgn(num):
     return 1 if num >= 0 else -1
 
 
-# robot drive constants
-DriveScale = 0.15
-WheelRadius = 0.04
-WheelDist = 0.08;
-
-
 # rotate in place a given number of radians
 def drive_rotate(scrib, rad):
     uL = -100*sgn(rad)
     uR = 100*sgn(rad)
-    radPerSec = scale*(uL-uR)*WheelRadius/WheelDist
-    time = rad / radPerSec
+    time = rad / (6.25*math.pi) * 20
 
-    scrib.runCommands([[uL, uR, time]])
+    scrib.runCommands([[uL, uR, time], [0, 0, 0]])
 
 
 # move forward a given distance (in inches)
 def drive_forward(scrib, inches):
     u = 100
-    speed = u*DriveScale*WheelRadius
-    time = inches / speed
-
-    scrib.runCommands([[u, u, time]])
+    time = inches / 14.5 * 5
+    scrib.runCommands([[u, u, time], [0, 0, 0]])
 
 
 
 # move to a new position and orientation as specified by the rotation and translation matrices given
 # @param theta - the amount to rotate
 def line_up(theta, trans, targetPos):
+    pass
     # turn in the direction of the new position we should be in
     # TODO:
 
@@ -175,25 +166,37 @@ def line_up(theta, trans, targetPos):
 
 
 
-def main():
-    # connect and initialize Scribbler robot
+def takePicture(s, num):
+    pic_fname = "pic-%d.jpg" % num
+    pic = s.takePicture('jpeg')
+    s.savePicture(pic, pic_fname)
+    return pic_fname
+
+
+def initScribbler():
     fname = "log-%d.txt" % time.time()
-    s = Scribbler2('/dev/tty.Fluke2-0610-Fluke2',fname)
+    s = Scribbler2('/dev/tty.Fluke2-07DE-Fluke2',fname)
     print 'Connected!'
     s.setForwardness(1)
+    return s
+
+
+def main():
+    s = initScribbler()
 
     targetPos = np.append(0, -12)
 
+    picnum = 1
+
     while True:
         # take a picture
-        pic_fname = "pic-%d.jpg" % time.time()
-        pic = s.takePicture('jpeg')
-        s.savePicture(pic, pic_fname)
+        picname = takePicture(s, 1)
+        picnum += 1
 
-        corners, cntAnnotatedImg = find_black_square(pic_fname)
+        corners, cntAnnotatedImg = find_black_square(picname)
         found, rot, trans = getRT(corners)
 
-        if !found:
+        if not found:
             printf("Error: getRT() failed... exiting")
             break
 
@@ -206,4 +209,8 @@ def main():
 
 
     s.close();
+
+
+if __name__ == '__main__':
+    main()
 
