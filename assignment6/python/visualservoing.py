@@ -6,61 +6,6 @@ import math
 from matplotlib import pyplot as plt
 
 
-## Connect to the scribbler
-##Set timeout to 0 to read instantly, non-blocking
-#
-# fname = "log-%d.txt" % time.time()
-#
-# s = Scribbler2('/dev/tty.Fluke2-0610-Fluke2',fname)
-#
-# # Set timeout to zero
-# print 'Connected!'
-# s.setIRPower(140)
-# s.setForwardness(1)
-# # Create a list of commands
-# # Command is a list [cmd, leftMotor, rightMotor, time]
-# # Setting motors to 200 will drive
-# # forward with the fluke facing forward
-#
-# # Run the robot
-# commands = []
-# commands.append([100, 100, 1])
-# commands.append([0,0,1])
-# s.runCommands(commands);
-#
-#
-#
-# ## Take picture
-# pic_fname = "pic-%d.jpg" % time.time()
-# picture = s.takePicture('jpeg');
-# s.savePicture(picture, pic_fname)
-#
-#
-# # Run the robot again
-# commands = []
-# commands.append([100, 100, 1])
-# commands.append([0,0,1])
-# s.runCommands(commands);
-#
-#
-# ## Take picture
-# pic_fname = "pic-%d.jpg" % time.time()
-# picture = s.takePicture('jpeg');
-# s.savePicture(picture, pic_fname)
-
-# TODO: uncomment to connect to scribbler robot
-# fname = "log-%d.txt" % time.time()
-# s = Scribbler2('/dev/tty.Fluke2-0610-Fluke2',fname)
-
-# Set timeout to zero
-# print 'Connected!'
-# s.setIRPower(140)
-# s.setForwardness(1)
-# Create a list of commands
-# Command is a list [cmd, leftMotor, rightMotor, time]
-# Setting motors to 200 will drive 
-# forward with the fluke facing forward
-
 
 # returns a contour object and an image with the contour overlaid on it (for debuggint)
 # if @debug is True, displays all intermediate images and waits for a key press before returning
@@ -143,6 +88,7 @@ def find_black_square(imgPath, debug = False):
 
     return square, cntAnnotatedImg
 
+
 # returns F, R, T given an image of a 4" x 4" black square
 # F is a boolean representing found
 # R is Z rotation in radians
@@ -205,54 +151,59 @@ def drive_rotate(scrib, rad):
     scrib.runCommands([[uL, uR, time]])
 
 
-# move forward a given distance (in meters)
-def drive_forward(scrib, meters):
+# move forward a given distance (in inches)
+def drive_forward(scrib, inches):
     u = 100
     speed = u*DriveScale*WheelRadius
-    time = meters / speed
+    time = inches / speed
 
     scrib.runCommands([[u, u, time]])
 
 
-# # Run the robot
-# commands = []
-# commands.append([100, 100, 1])
-# commands.append([0,0,1])
-# s.runCommands(commands);
 
-# ## Take picture
-# pic_fname = "pic-%d.jpg" % time.time()
-# picture = s.takePicture('jpeg');
-# s.savePicture(picture, pic_fname)
+# move to a new position and orientation as specified by the rotation and translation matrices given
+# @param theta - the amount to rotate
+def line_up(theta, trans, targetPos):
+    # turn in the direction of the new position we should be in
+    # TODO:
 
+    # move the right amount to get there
+    # TODO:
 
-## Image Transform Stuff
-# mat = cv2.Mat()
-
-# Essential Matrix
-# emat = np.matrix()
-
-# Intrinsic Matrix
-# kmat = np.matrix([1211.2959, 0, 657.15924], [0, 1206.00512, 403.17667], [0, 0, 1])
-
-# Fundamental Matrix
-# F = (K^-1)^T * E * (K^-1)
-# kmat_inv = np.linalg.inv(kmat)
-# fmat = np.dot(np.transpose(kmat_inv), emat)
-# fmat = np.dot(fmat, kmat_inv)
-
-# # Run the robot again
-# commands = []
-# commands.append([100, 100, 1])
-# commands.append([0,0,1])
-# s.runCommands(commands);
+    # rotate to face the direction we're supposed to
+    # TODO:
 
 
-# ## Take picture
-# pic_fname = "pic-%d.jpg" % time.time()
-# picture = s.takePicture('jpeg');
-# s.savePicture(picture, pic_fname)
+
+def main():
+    # connect and initialize Scribbler robot
+    fname = "log-%d.txt" % time.time()
+    s = Scribbler2('/dev/tty.Fluke2-0610-Fluke2',fname)
+    print 'Connected!'
+    s.setForwardness(1)
+
+    targetPos = np.append(0, -12)
+
+    while True:
+        # take a picture
+        pic_fname = "pic-%d.jpg" % time.time()
+        pic = s.takePicture('jpeg')
+        s.savePicture(pic, pic_fname)
+
+        corners, cntAnnotatedImg = find_black_square(pic_fname)
+        found, rot, trans = getRT(corners)
+
+        if !found:
+            printf("Error: getRT() failed... exiting")
+            break
+
+        # see if we're at the target point yet
+        if rot < math.pi / 8 and np.linalg.norm(trans - targetPos) < 4:
+            print("Made it!")
+            break
+
+        line_up(rot, trans, targetPos)
 
 
-# # Close (Do not remove this line)
-# s.close();
+    s.close();
+
