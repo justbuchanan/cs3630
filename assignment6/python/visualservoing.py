@@ -124,29 +124,29 @@ def getRT(corners):
     lengthbot = corners[3][0] - corners[2][0]
     widthavg = (lengthtop + lengthbot)/2
 
-
-    print "heightavg"
-    print heightavg
-
-    print "heightdif"
-    print heightdif
-
-    print "widthavg"
-    print widthavg
-
-
-    print "theta"
-    print heightdif/heightavg
+    #
+    # print "heightavg"
+    # print heightavg
+    #
+    # print "heightdif"
+    # print heightdif
+    #
+    # print "widthavg"
+    # print widthavg
+    #
+    #
+    # print "theta"
+    # print heightdif/heightavg
     # Xpix = 1280 Ypix = 800
 
 
     # print corners
     # print centerx
     # print centery
-    print "disttol"
-    print disttoline(heightleft)
-    print "disttor"
-    print disttoline(heightright)
+    # print "disttol"
+    # print disttoline(heightleft)
+    # print "disttor"
+    # print disttoline(heightright)
     if heightleft > heightright:
         theta = -1
     else:
@@ -183,14 +183,14 @@ def thetaofbot(avgvlinesize, hlinesize):
 # cv2.waitKey()
 # demo!
 # sq1, img1 = find_black_square('../start.jpg')
-sq2, img2 = find_black_square('test-images/pic-6.jpg')
-R, T = getRT(sq2)
-print "R"
-print R
-print "T"
-print T
-cv2.imshow('start', img2)
-cv2.waitKey()
+# sq2, img2 = find_black_square('test-images/pic-6.jpg')
+# R, T = getRT(sq2)
+# print "R"
+# print R
+# print "T"
+# print T
+# cv2.imshow('start', img2)
+# cv2.waitKey()
 # sq5, img5 = find_black_square('test-images/pic-5.jpg')
 # F, R, T = getRT(sq5)
 # cv2.imshow('5', img5)
