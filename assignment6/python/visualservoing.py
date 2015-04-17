@@ -135,20 +135,20 @@ def getRT(corners):
 # # F, R, T = getRT(sq1)
 # cv2.imshow('Start', img1)
 
-# demo!
-sq1, img1 = find_black_square('../start.jpg')
-sq2, img2 = find_black_square('../goal.jpg')
-print "5"
-# sq5, img5 = find_black_square('test-images/pic-5.jpg')
-# F, R, T = getRT(sq5)
-# cv2.imshow('5', img5)
-sq6, img6 = find_black_square('test-images/pic-6.jpg')
-F, R, T = getRT(sq6)
-cv2.imshow('6', img6)
-# sq8, img8 = find_black_square('test-images/pic-8.jpg')
-# cv2.imshow('8', img8)
-# F, R, T = getRT(sq8)
-cv2.waitKey()
+# # demo!
+# sq1, img1 = find_black_square('../start.jpg')
+# sq2, img2 = find_black_square('../goal.jpg')
+# print "5"
+# # sq5, img5 = find_black_square('test-images/pic-5.jpg')
+# # F, R, T = getRT(sq5)
+# # cv2.imshow('5', img5)
+# sq6, img6 = find_black_square('test-images/pic-6.jpg')
+# F, R, T = getRT(sq6)
+# cv2.imshow('6', img6)
+# # sq8, img8 = find_black_square('test-images/pic-8.jpg')
+# # cv2.imshow('8', img8)
+# # F, R, T = getRT(sq8)
+# cv2.waitKey()
 
 #
 # cv2.waitKey()
@@ -164,7 +164,7 @@ def sgn(num):
 def drive_rotate(scrib, rad):
     uL = -100*sgn(rad)
     uR = 100*sgn(rad)
-    time = rad / (6.25*math.pi) * 20
+    time = rad*sgn(rad) / (6.25*math.pi) * 20
 
     scrib.runCommands([[uL, uR, time], [0, 0, 0]])
 
@@ -176,21 +176,42 @@ def drive_forward(scrib, inches):
     scrib.runCommands([[u, u, time], [0, 0, 0]])
 
 
+#
+# move to the given target location given the displacement from the origin
+#
+#   ^
+#   |
+#   | +Z
+#   |
+#   |
+#   |______________> +X
+#
+#   The coordinate system is as shown.  This is the above view of the world looking down at the floor.  The origin is at the center of the target square.
+#   Angles are relative to the +Z axis with positive values being counter-clockwise.
+#
+def line_up(scrib, theta, trans, targetPos, debug = False):
+    posErr = targetPos - trans
 
-# move to a new position and orientation as specified by the rotation and translation matrices given
-# @param theta - the amount to rotate
-def line_up(theta, trans, targetPos):
-    pass
-    # turn in the direction of the new position we should be in
-    disttoorigin = np.sqrt(trans[0]**2 + trans[1]**2)
-    firstrotation = r
+    angleToTarget = math.atan2(posErr[1], posErr[0]) - math.pi/2
 
+    if debug:
+        print ">>> posErr: " + str(posErr)
+        print ">>> angleToTarget: " + str(angleToTarget)
 
-    # move the right amount to get there
-    # TODO:
+    # rotate to face the target point
+    dTheta = angleToTarget-theta
+    if debug: print ">>> Rotating: " + str(dTheta)
+    drive_rotate(scrib, dTheta)
 
-    # rotate to face the direction we're supposed to
-    # TODO:
+    # drive to the target point
+    dist = np.linalg.norm(trans)
+    if debug: print ">>> Moving: " + str(dist)
+    drive_forward(scrib, dist)
+
+    # rotate back to face the square
+    dTheta = -angleToTarget
+    if debug: print ">>> Rotating: " + str(dTheta)
+    drive_rotate(scrib, dTheta)
 
 
 
@@ -212,7 +233,7 @@ def initScribbler():
 def main():
     s = initScribbler()
 
-    targetPos = np.append(0, -12)
+    targetPos = np.array([0, -15])
 
     picnum = 1
 
@@ -233,7 +254,7 @@ def main():
             print("Made it!")
             break
 
-        line_up(rot, trans, targetPos)
+        line_up(s, rot, trans, targetPos)
 
 
     s.close();
