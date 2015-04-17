@@ -290,17 +290,18 @@ def initScribbler():
 def main():
     s = initScribbler()
 
-    targetPos = np.array([0, -15])
+    targetPos = np.array([0, -12])
 
-    picnum = 1
+    picnum = 0
 
     while True:
+        picnum += 1
         # take a picture
         picname = takePicture(s, 1)
         print "Took a picture (number " + str(picnum) + ")!"
-        picnum += 1
 
         corners, cntAnnotatedImg = find_black_square(picname)
+        cv2.imwrite('pic-%d-annotated.jpg' % picnum, cntAnnotatedImg)
         found, rot, trans = getRT(corners)
         print "getRT() returned " + str(rot) + ", " + str(trans)
 
